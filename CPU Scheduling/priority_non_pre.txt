@@ -1,0 +1,13 @@
+Processes are scheduled based on priority; higher-priority processes are selected first.
+
+In non-preemptive scheduling, once a process starts executing, 
+it runs to completion without interruption, regardless of new processes arriving with higher priority.
+
+Non-preemptive scheduling is simpler to implement compared to 
+preemptive scheduling as there’s no need to constantly check for higher-priority processes.
+
+Since a process runs to completion once it starts, there’s less context switching,
+reducing the overhead associated with frequent task switching.
+
+Lower-priority processes may experience starvation if higher-priority processes continue arriving,
+delaying their execution indefinitely.

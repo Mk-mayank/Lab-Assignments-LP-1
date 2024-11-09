@@ -1,0 +1,17 @@
+FCFS Theory :
+
+This is the simplest CPU scheduling algorithm.
+In the FCFS scheduling algorithm, the process that arrives first is executed first.
+FCFS is non-preemptive, meaning once a process starts its execution, 
+it runs to completion before the next process can start.
+
+Advantages: Easy to implement.
+
+Disadvantages: It may lead to the "convoy effect", leading to poor CPU utilization and
+high average wait times if long processes are executed before short ones.
+
+How It Works:
+
+Maintain a queue of processes.
+When the CPU is free, dispatch the process at the front of the queue.
+New processes are appended at the end of the queue.

@@ -1,0 +1,22 @@
+
+Round Robin (RR) Scheduling is a preemptive CPU scheduling algorithm commonly used in 
+time-sharing and multitasking operating systems. In this algorithm, each process is 
+assigned a fixed time slice (or "quantum") during which it can run. 
+If a process does not finish within its time quantum, it is preempted and placed 
+back in the ready queue, allowing the next process in line to use the CPU. The cycle 
+continues until all processes are complete.
+
+Round Robin is inherently preemptive, meaning processes are interrupted and 
+moved back to the ready queue if they exceed their time quantum.
+
+RR scheduling is generally considered fair because each process receives equal 
+CPU time in a cyclic order, avoiding starvation.
+
+Round Robin is widely used in time-sharing systems where the goal is to allow multiple 
+users or applications to interact with the system almost simultaneously.
+
+Modern OS task schedulers use Round Robin to manage multiple processes, ensuring that no 
+single task monopolizes the CPU.
+
+Round Robin is also applied in network routers and switches to process data packets from
+multiple sources fairly. This ensures that all network flows get equal access to bandwidth, improving overall network performance.

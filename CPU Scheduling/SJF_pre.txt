@@ -1,0 +1,24 @@
+Shortest Job First (SJF) Preemptive Scheduling, also known as Shortest Remaining Time First (SRTF), 
+is a CPU scheduling algorithm where the process with the shortest remaining burst time is 
+selected for execution. Unlike non-preemptive SJF,
+SRTF can interrupt a running process if a new process arrives with a shorter burst time.
+
+In SRTF, the CPU always picks the process with the shortest remaining time, which means that 
+a running process may be interrupted if another process with a shorter burst time arrives.
+
+Similar to non-preemptive SJF, SRTF can lead to starvation for longer processes if shorter 
+jobs keep arriving. Long processes may experience excessive delays in execution.
+
+SRTF requires continuous monitoring of remaining burst times to select the next job, 
+making it more complex to implement than non-preemptive SJF.
+The scheduler must decide in real-time whether to switch to a new process.
+
+
+-- Usecase
+
+Operating System Task Scheduling for Interactive User Tasks:
+
+When a user opens a small app or initiates a lightweight task
+(e.g., checking notifications or opening a menu), the operating system prioritizes these quick tasks
+interrupting longer background processes like system updates, backups, or large file transfers.
+
