@@ -1,0 +1,13 @@
+Best Fit allocates the smallest available memory block that is large enough to satisfy the request.
+
+When a process requires memory, the OS scans the entire list of available memory blocks.
+It finds the block that is the closest fit for the process’s memory requirement 
+(i.e., the smallest block that can accommodate the request).
+If found, the process is placed in that block; any leftover space becomes a smaller free block.
+
+Advantages:
+Minimizes Wasted Space: By choosing the smallest suitable block, it reduces the amount of unused memory left over.
+Disadvantages:
+High Fragmentation: Over time, this can create many small memory fragments, 
+leading to memory that is unusable for larger processes.
+Slower Allocation: Needs to scan all blocks to find the best fit, which can slow down allocation time.
