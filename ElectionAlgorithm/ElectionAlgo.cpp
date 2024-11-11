@@ -1,152 +1,116 @@
-#include <bits/stdc++.h>
-#include <unistd.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
-// Candidate class to represent each candidate in the election
-class Candidate {
+class Process {
+    bool active;
 public:
-    int id;  // ID of the candidate
-    bool act;  // Whether the candidate is active or failed
+    int pId;
 
-    Candidate() : id(0), act(true) {}
+    Process(int id) : pId(id), active(true) {}
 
-    // Function to add a new candidate's ID
-    void addCandidate() {
-        cout << "Enter the ID of new Candidate: ";
-        cin >> id;
+    void down() {
+        active = false;
+    }
+
+    void up() {
+        active = true;
+    }
+
+    bool isActive() const {
+        return active;
     }
 };
 
-// Election class to manage the election process
-class Election {
+class BullyElection {
+    int coordinatorId;
 public:
-    vector<Candidate> v;  // Vector to store the candidates
-    int currindex;  // Index of the current coordinator
+    vector<Process> Processes;
 
-    // Function to get a new candidate
-    void getCandidate() {
-        Candidate c;
-        c.addCandidate();  // Call the addCandidate method to set the candidate's ID
-        v.push_back(c);  // Add the candidate to the vector
+    BullyElection(vector<Process>& processes) {
+        this->Processes = processes;
     }
 
-    // Function to simulate the failure of the current coordinator
-    void addFailure() {
-        int max = 0;
-        // Find the current coordinator (the one with the highest ID)
-        for (int i = 0; i < v.size(); i++) {
-            if (v[i].id > max && v[i].act) {
-                max = v[i].id;
-                currindex = i;
+    void startElection(int initiatorId) {
+        cout << "Election initiated by process: " << initiatorId << endl;
+        for (int i = initiatorId + 1; i < Processes.size(); i++) {
+            if (Processes[i].isActive()) {
+                cout << "Process " << i << " gets an election message from " << initiatorId << endl;
             }
         }
-        // Announce the current coordinator
-        cout << "Current Coordinator is " << v[currindex].id << endl;
-        sleep(2);
-        cout << "Current Coordinator Failed" << endl;
-        cout << "Detected by: " << v[(currindex - 1 + v.size()) % v.size()].id << endl;
-        v[currindex].act = false;  // Mark the current coordinator as inactive
-        sleep(2);
-        cout << "Election Initialized" << endl;
+        coordinateElection(initiatorId);
     }
 
-    // Ring Election Algorithm
-    void RingElection() {
-        int old = currindex;  // Store the current coordinator's index
-        int new1 = (old - 1 + v.size()) % v.size();  // Move to the previous node (candidate)
-        int cnt = 0;
-
-        while (new1 != old) {
-            int next = (new1 + 1) % v.size();  // Wrap around if needed (ring structure)
-            if (v[next].act) {
-                sleep(2);
-                cout << "Message passed from " << v[new1].id << " to " << v[next].id << endl;
-            }
-            new1 = next;
-        }
-
-        // After the loop, find the new coordinator (the one with the highest ID)
-        int max = 0;
-        for (int i = 0; i < v.size(); i++) {
-            if (v[i].id > max && v[i].act) {
-                max = v[i].id;
-                currindex = i;
+    void coordinateElection(int initiatorId) {
+        for (int i = Processes.size() - 1; i >= initiatorId; i--) {
+            if (Processes[i].isActive()) {
+                cout << "Process " << i << " becomes coordinator" << endl;
+                coordinatorId = i;
+                announceResult();
+                return;
             }
         }
-        cout << "New Coordinator is " << v[currindex].id << endl;
     }
 
-    // Bully Election Algorithm
-    void bullyElection() {
-        int max = 0;
-        for (int i = 0; i < v.size(); i++) {
-            if (v[i].id > max && v[i].act) {
-                max = v[i].id;
-                currindex = i;
+    void announceResult() {
+        for (const Process& pro : Processes) {
+            if (pro.isActive() && pro.pId != coordinatorId) { // Skip self-acknowledgment
+                cout << "Process " << pro.pId << " acknowledges process " << coordinatorId << " as coordinator" << endl;
             }
-        }
-        cout << "Current Coordinator is " << v[currindex].id << endl;
-        sleep(1);
-        cout << "Current Coordinator Failed" << endl;
-
-        int new1 = (currindex - 1 + v.size()) % v.size();
-        cout << "Detected by " << v[new1].id << endl;
-        v[currindex].act = false;
-
-        sleep(2);
-        cout << "Election Initialized" << endl;
-
-        bool foundCoordinator = false;
-        for (int i = new1; i != currindex; i = (i + 1) % v.size()) {
-            if (v[i].act && v[i].id > v[currindex].id) {
-                cout << "Message passed from " << v[new1].id << " to " << v[i].id << endl;
-                currindex = i;
-                foundCoordinator = true;
-                break;
-            }
-        }
-
-        if (!foundCoordinator) {
-            cout << "Coordinator is " << v[currindex].id << endl;
         }
     }
 };
 
-// Main function to interact with the user and run the election
+class RingElection {
+    int coordinatorId;
+public:
+    vector<Process> process;
+
+    RingElection(vector<Process> pro) : process(pro) {}
+
+    void startElection(int initiatorId) {
+        cout << "Election initiated by process " << initiatorId << endl;
+        coordinatorId = initiatorId;
+
+        // Wrap around the ring in a circular manner
+        int i = (initiatorId + 1) % process.size();
+        while (i != initiatorId) {
+            if (process[i].isActive()) {
+                cout << "Process " << i << " gets an election message from " << initiatorId << endl;
+                coordinatorId = max(coordinatorId, i);
+            }
+            i = (i + 1) % process.size();  // Move to the next process in a circular manner
+        }
+        announceCoordinator();
+    }
+
+    void announceCoordinator() {
+        cout << "Process " << coordinatorId << " becomes coordinator" << endl;
+        for (const Process& pro : process) {
+            if (pro.isActive() && pro.pId != coordinatorId) { // Skip self-acknowledgment
+                cout << "Process " << pro.pId << " acknowledges process " << coordinatorId << " as coordinator" << endl;
+            }
+        }
+    }
+};
+
 int main() {
-    Election e;  // Create an Election object
-    bool loop = true;
-
-    while (loop) {
-        int n;
-        cout << "Enter the number of candidates: ";
-        cin >> n;
-
-        // Add candidates
-        for (int i = 0; i < n; i++) {
-            e.getCandidate();  // Add each candidate to the election process
-        }
-
-        cout << "Choose an election algorithm: \n";
-        cout << "1. Ring Algorithm\n2. Bully Algorithm\n3. Exit\n";
-        int choice;
-        cin >> choice;
-
-        switch (choice) {
-            case 1:
-                e.addFailure();  // Simulate coordinator failure
-                e.RingElection();  // Run Ring Election Algorithm
-                break;
-            case 2:
-                e.addFailure();  // Simulate coordinator failure
-                e.bullyElection();  // Run Bully Election Algorithm
-                break;
-            case 3:
-                loop = false;  // Exit the loop if the user chooses 3
-                break;
-            default:
-                cout << "Invalid choice! Please select again.\n";
-        }
+    vector<Process> Processes;
+    int num = 5;
+    for (int i = 0; i < num; i++) {
+        Processes.push_back(Process(i));
     }
+
+    cout << "Number of Processes: " << Processes.size() << endl;
+
+    BullyElection bully(Processes);
+    bully.Processes[2].down();  // Simulate a failure of Process 2
+    bully.startElection(1);     // Start Bully Election from Process 1
+
+    cout << "\n--- Ring Election ---\n";
+    RingElection ring(Processes);
+    ring.process[2].down();     // Simulate a failure of Process 2
+    ring.startElection(1);      // Start Ring Election from Process 1
+
     return 0;
 }
